@@ -83,22 +83,37 @@ def welcomeScreen():
 #Computing
 def computing():
     clearScreen()
+    global computing_qa
     computing_qa = {
         "coffee": "The coffee shop opens at 7am.",
-        "subject": "We teach various programming and data science related subjects in this course."
+        "subject": "We teach various programming and data science related subjects in this course.",
+        "time": "College hour starts form morning 6 AM"
     }
 
-    print("Welcome to Computing pelase ask me whatever you want to know")
+    print("Welcome to Computing")
+    print("Press 1 to view FAQs or type 'back' to restart chat")
     while True:
         question = input(f"\n{userName}: ").lower()
         checkExit(question)
         
+        if question == "back":
+            computing()
+            break
+        
         if question == "1":
             faq()
             break
-        elif question in computing_qa:
-            print(f"\n{botName}: {computing_qa[question]}")
-        else:
+        
+        # Split input into words and check for keywords
+        words = question.split()
+        found = False
+        for key in computing_qa:
+            if key in words:
+                print(f"\n{botName}: {computing_qa[key]}")
+                found = True
+                break
+        
+        if not found:
             print(f"\n{botName}: Sorry, I can't answer that at this moment. Please call us for more enquiries.")
 
 #Cyber Security
@@ -107,7 +122,8 @@ def cyberSecurity():
     choice2 = input("Press 1 to view FAQs or enter question to chat with " + botName + " : ")    
     if choice2 == "1":
         faq()
-    
+    if choice2 == "back":
+        cyberSecurity()
 
 #Data Science
 def dataScience():
@@ -128,7 +144,7 @@ def adminScreen():
     print("Welcome Admin")
     print("1. View Users Setting")
     print("2. View Faq Settings")
-    print("3. View Recent chats")
+    print("3. Manage Keywords")
     print("4. Exit")
     adminChoice = input("Enter your choice: ")
     if adminChoice == "1":
@@ -136,7 +152,7 @@ def adminScreen():
     elif adminChoice == "2":
         viewFaq()
     elif adminChoice == "3":
-        viewChats()
+        manageKeywords()
     else:
         exit()
 
@@ -172,11 +188,41 @@ def viewUsers():
     adminScreen()
 
 def viewFaq():
-    print("View Faq")
-
-
+   pass
 
 def viewChats():
     print("View Chats")
+
+def manageKeywords():
+    clearScreen()
+    global computing_qa
+    while True:
+        print("\nKeyword Management")
+        print("1. View Keywords")
+        print("2. Add Keyword")
+        print("3. Delete Keyword")
+        print("4. Back")
+        
+        choice = input("Enter choice: ")
+        if choice == "1":
+            print("\nCurrent Keywords and Answers:")
+            for key, value in computing_qa.items():
+                print(f"\nKeyword: {key}")
+                print(f"Answer: {value}")
+        elif choice == "2":
+            keyword = input("Enter new keyword: ").lower()
+            answer = input("Enter answer for this keyword: ")
+            computing_qa[keyword] = answer
+            print("Keyword added successfully!")
+        elif choice == "3":
+            keyword = input("Enter keyword to delete: ").lower()
+            if keyword in computing_qa:
+                del computing_qa[keyword]
+                print("Keyword deleted successfully!")
+            else:
+                print("Keyword not found!")
+        elif choice == "4":
+            break
+        input("\nPress Enter to continue...")
 
 welcomeScreen()
