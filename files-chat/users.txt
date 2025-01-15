@@ -1,8 +1,8 @@
 Name: Dipsan
 Number: 9815085801
-Course: Computing
+Course: 1
 ------------------------------
-Name: Dipsan
+Name: dipsan
 Number: 9815085801
-Course: Computing
+Course: 1
 ------------------------------
