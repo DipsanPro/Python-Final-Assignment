@@ -3,24 +3,19 @@ from statistics import mean
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-def read_driver_info(filename: str = "files-f1/drivers.txt") -> Dict[str, dict]:
-    """Read driver information from drivers.txt file"""
-    drivers = {}
-    try:
-        with open(filename, 'r') as file:
-            for line in file:
-                code, number, name, team = line.strip().split(',')
-                drivers[code] = {
-                    'number': number,
-                    'name': name,
-                    'team': team
-                }
-    except FileNotFoundError:
-        print(f"Warning: Driver info file {filename} not found")
-    return drivers
+def read_driver_info() -> Dict[str, dict]:
+    """Read driver information from the file and return a dictionary."""
+    driver_info = {}
+    with open('./files-f1/f1_drivers.txt', 'r') as file:
+        for line in file:
+            parts = line.strip().split(',')
+            if len(parts) == 4:
+                _, driver_code, name, team = parts
+                driver_info[driver_code] = {'name': name, 'team': team}
+    return driver_info
 
 def process_timing_file(filename: str) -> Tuple[str, Dict[str, List[float]]]:
-    """Process the timing file and return location and lap times"""
+    """Process the timing file and return location and lap times."""
     driver_times = {}
     location = ""
     
@@ -48,9 +43,8 @@ def process_timing_file(filename: str) -> Tuple[str, Dict[str, List[float]]]:
         
     return location, driver_times
 
-# Modify calculate_stats function to include lap count
 def calculate_stats(driver_times: Dict[str, List[float]]) -> Dict[str, dict]:
-    """Calculate statistics for each driver"""
+    """Calculate statistics for each driver."""
     stats = {}
     for driver, times in driver_times.items():
         stats[driver] = {
@@ -60,40 +54,20 @@ def calculate_stats(driver_times: Dict[str, List[float]]) -> Dict[str, dict]:
         }
     return stats
 
-def display_results(location: str, stats: Dict[str, dict], driver_info: Dict[str, dict]):
-    """Display formatted results"""
-    print(f"\nFormula 1 Timing Board - {location}")
+def display_results(location, stats, driver_info):
+    """Display the results including driver names, teams, fastest lap, and average lap time."""
+    print(f"\nLocation: {location}")
+    print("Driver Code Name                Team                Fastest     Average")
     print("-" * 80)
-    
-    # Find fastest overall time
-    fastest_driver = min(stats.items(), key=lambda x: x[1]['fastest'])
-    print(f"\nFastest Lap: {fastest_driver[0]} - {fastest_driver[1]['fastest']:.3f}")
-    
-    # Calculate overall average
-    all_times = [time for driver_stats in stats.values() for time in [driver_stats['fastest']]]
-    overall_average = mean(all_times)
-    print(f"Overall Average: {overall_average:.3f}")
-    
-    # Display detailed results
-    print("\nDetailed Results:")
-    print("-" * 80)
-    print(f"{'Driver Code':<12}{'Name':<20}{'Team':<20}{'Fastest':<12}{'Average':<12}")
-    print("-" * 80)
-    
-    # Sort by fastest lap time
-    sorted_stats = sorted(stats.items(), key=lambda x: x[1]['fastest'])
-    
-    for driver_code, driver_stats in sorted_stats:
-        driver = driver_info.get(driver_code, {})
-        name = driver.get('name', 'Unknown')
-        team = driver.get('team', 'Unknown')
-        
-        print(f"{driver_code:<12}{name[:19]:<20}{team[:19]:<20}"
-              f"{driver_stats['fastest']:<12.3f}{driver_stats['average']:<12.3f}")
+    for driver_code, driver_stats in stats.items():
+        name = driver_info.get(driver_code, {}).get('name', 'Unknown')
+        team = driver_info.get(driver_code, {}).get('team', 'Unknown')
+        fastest = driver_stats.get('fastest', 'N/A')
+        average = driver_stats.get('average', 'N/A')
+        print(f"{driver_code:<10} {name:<20} {team:<20} {fastest:<10} {average:<10}")
 
-# Add new menu option
 def display_menu():
-    """Display the menu options"""
+    """Display the menu options."""
     print("\nF1 Timing Board - Menu")
     print("1. Show Race Location")
     print("2. Show Fastest Overall Lap")
@@ -106,6 +80,7 @@ def display_menu():
     return input("Select an option (1-8): ")
 
 def display_fastest_overall(stats: Dict[str, dict], driver_info: Dict[str, dict]):
+    """Display the fastest overall lap."""
     fastest_driver = min(stats.items(), key=lambda x: x[1]['fastest'])
     driver_code = fastest_driver[0]
     fastest_time = fastest_driver[1]['fastest']
@@ -113,6 +88,7 @@ def display_fastest_overall(stats: Dict[str, dict], driver_info: Dict[str, dict]
     print(f"\nFastest Overall Lap: {driver_name} ({driver_code}) - {fastest_time:.3f}")
 
 def display_all_fastest(stats: Dict[str, dict], driver_info: Dict[str, dict]):
+    """Display all drivers' fastest laps."""
     print("\nAll Drivers' Fastest Laps:")
     print("-" * 50)
     sorted_stats = sorted(stats.items(), key=lambda x: x[1]['fastest'])
@@ -121,27 +97,29 @@ def display_all_fastest(stats: Dict[str, dict], driver_info: Dict[str, dict]):
         print(f"{name:<20} ({driver_code}): {driver_stats['fastest']:.3f}")
 
 def display_overall_average(stats: Dict[str, dict]):
+    """Display the overall average lap time."""
     all_times = [time for driver_stats in stats.values() for time in [driver_stats['fastest']]]
     overall_avg = mean(all_times)
     print(f"\nOverall Average Time: {overall_avg:.3f}")
 
 def display_driver_averages(stats: Dict[str, dict], driver_info: Dict[str, dict]):
+    """Display each driver's average lap time."""
     print("\nDriver Average Times:")
     print("-" * 50)
     for driver_code, driver_stats in stats.items():
         name = driver_info.get(driver_code, {}).get('name', 'Unknown')
         print(f"{name:<20} ({driver_code}): {driver_stats['average']:.3f}")
 
-# Add new display function
 def display_lap_counts(stats: Dict[str, dict], driver_info: Dict[str, dict]):
+    """Display the number of laps per driver."""
     print("\nNumber of Laps per Driver:")
     print("-" * 50)
     for driver_code, driver_stats in stats.items():
         name = driver_info.get(driver_code, {}).get('name', 'Unknown')
         print(f"{name:<20} ({driver_code}): {driver_stats['laps']} laps")
 
-# Modify main loop to include new option
 def main():
+    """Main function to run the F1 Timing Board application."""
     if len(sys.argv) != 2:
         print("Usage: python main.py <timing_file>")
         sys.exit(1)
@@ -152,23 +130,27 @@ def main():
     stats = calculate_stats(driver_times)
     
     while True:
-        choice = display_menu()
+        print("\nMenu:")
+        print("1. Display all fastest laps")
+        print("2. Display overall average lap time")
+        print("3. Display driver averages")
+        print("4. Display results")
+        print("5. Display lap counts")
+        print("6. Exit")
+        
+        choice = input("Enter your choice: ")
         
         if choice == '1':
-            print(f"\nRace Location: {location}")
-        elif choice == '2':
-            display_fastest_overall(stats, driver_info)
-        elif choice == '3':
             display_all_fastest(stats, driver_info)
-        elif choice == '4':
+        elif choice == '2':
             display_overall_average(stats)
-        elif choice == '5':
+        elif choice == '3':
             display_driver_averages(stats, driver_info)
-        elif choice == '6':
+        elif choice == '4':
             display_results(location, stats, driver_info)
-        elif choice == '7':
+        elif choice == '5':
             display_lap_counts(stats, driver_info)
-        elif choice == '8':
+        elif choice == '6':
             print("\nThank you for using F1 Timing Board!")
             break
         else:
