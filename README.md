@@ -8,6 +8,12 @@ Folders:
 
     protfolio: Contains weekly assignments and exercises
 
-    project-f1: Contains files for f1 project 
+    project-f1: Contains main files for f1 project 
 
+    project-chat: Contains main files for chatbot project 
+
+    files-f1 contains files for f1
+
+    files-chat contains files for chatbot
+    
 For more information please read specefic readme files present at project folders.
